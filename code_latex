@@ -1,0 +1,741 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{mathrsfs}
+\usepackage{mathabx}
+\usepackage{stackengine}
+\usepackage{dsfont}
+\usepackage{scalerel}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usepackage{stmaryrd}
+\usepackage{hyperref}
+\usepackage{mathrsfs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{wrapfig}
+\usepackage{wasysym}
+\usepackage{enumitem}
+\usepackage{perpage}
+\usepackage[symbol,bottom]{footmisc}
+\usepackage[a4paper]{geometry}
+\frenchbsetup{StandardLists=true}
+\geometry{hmargin=2cm,vmargin=3cm}
+\setlength{\parskip}{0cm}
+\definecolor{jbl}{rgb}{0.63, 0.79, 0.95}
+\newtheorem{theoreme}[subsection]{Theorème}
+\newtheorem{lemme}[subsection]{Lemme}
+\newtheorem{notation}[subsection]{Notation}
+\newtheorem{proposition}[subsection]{Proposition}
+\newtheorem{corollaire}[subsection]{Corollaire}
+\newtheorem{definition}[subsection]{Définition}
+\newtheorem{rmq}[subsection]{Remarque }
+\renewcommand{\thesection}{\arabic{section}}
+\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+\renewcommand*{\thefootnote}{(\arabic{footnote})}
+\newcommand{\indep}{\raisebox{0.05em}{\rotatebox[origin=c]{90}{$\models$}}}
+\newcommand{\p}{\mathds{P}}
+\newcommand{\esp}{\mathds{E}}
+\newcommand{\abs}[1]{\vert#1\vert}
+\DeclareMathOperator{\card}{\text{card}}
+\usepackage{minted}
+\newcommand{\combi}[2]{\arraycolsep=1pt\def\arraystretch{1.2}\begin{pmatrix}
+        #1\\#2
+\end{pmatrix}}
+\begin{document}
+    \begin{titlepage}
+        \newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+        \centering
+        \textsc{\LARGE Université Paris Dauphine}\\[1.5cm]
+        \includegraphics[width=300px]{data/logofac.png}
+        \HRule \\[0.4cm]
+        { \huge \bfseries\centering Marche simple sur $\mathbb{Z}$ conditionnée à revenir en 0 au temps $N$}\\[0.4cm]
+        \HRule \\[1.5cm]
+        \begin{minipage}{0.4\textwidth}
+            \begin{flushleft} \large
+                \emph{Auteurs :}\\
+                Emilie \textsc{Greff}
+                \\
+                Agathe \textsc{Rosenzweig}
+                \\
+               
+            \end{flushleft}
+        \end{minipage}
+        \begin{minipage}{0.4\textwidth}
+            \begin{flushright} \large
+                \emph{Superviseurs:} \\
+                \href{https://www.ceremade.dauphine.fr/~stoehr/}{Julien \textsc{Stoehr}} \\
+                \href{https://www.ceremade.dauphine.fr/~simenhaus/Francois_Simenhaus_-_Page_personelle/Accueil.html}{François \textsc{Simenhaus}}
+            \end{flushright}
+        \end{minipage}\\[2cm]
+        {\large \today}\\[2cm]
+        \begin{figure}[!h]
+            \centering
+            \begin{tikzpicture}[scale=0.75]
+            \tikzstyle{quadri}=[rectangle,draw,fill=yellow!50,text=blue]
+            \draw [very thin, black!15](0,0) grid (16,8);
+            \draw [very thick,black](0,4) -> (16,4);
+            \draw [very thick,black](0,0) -> (0,8);
+            \draw (0,4)--(1,5)--(2,4)--(3,3)--(4,2)--(5,3)--(6,4)--(7,5)--(8,6)--(9,7)--(10,6)--(11,5)--(12,6)--(13,7)--(14,6)--(15,5)--(16,4);
+            \draw [blue] (0,4)--(1,3)--(2,2)--(3,3)--(4,4)--(5,5)--(6,6)--(7,5)--(8,4)--(9,3)--(10,2)--(11,3)--(12,4)--(13,5)--(14,4)--(15,3)--(16,4);
+            \node [quadri](Q) at (16,3) {temps N};
+            \node [quadri](Q) at (0,3) {temps 0};
+            \end{tikzpicture}
+            \caption{Deux marches aléatoire revenant en 0 au temps $N$}
+        \end{figure}
+    \end{titlepage}
+    \tableofcontents
+    \pagebreak
+    \section{Introduction}
+ 
+    \subsection{Marche aléatoire simple sur $\mathbb{Z}$ et ses propriétés}
+    Soit $(\xi_i)_{i\geq0}$ une suite i.i.d de variable aléatoire de loi : $\dfrac{1}{2}(\delta_{-1}+\delta_1)$.
+    \\On définit $\left\{\begin{array}{l}
+    S_0=0\\S_n=\sum\limits_{i=1}^n\xi_i\; \:\forall n \geq 1
+   
+    \end{array}\right.$ la marche aléatoire simple sur $\mathbb{Z}$. De manière intuitive,on peut voir la marche aléatoire comme la position d'un marcheur qui fait $N$  pas ($ N \in \mathbb{N} $), et décide à chaque pas de temps de se rendre à gauche ou à droite,indépendamment du passé, avec probabilité $1/2$.
+    \\Le processus $(S_n)_{n\geq0}$ peut s'écrire comme la récurrence aléatoire suivante :
+    $$\forall n \geq 0,\;\; \:S_{n+1}=S_n+\xi_{n+1}$$  
+    Or, toute récurrence aléatoire est une chaîne de Markov, ce qui nous permet de conclure que $S_{n}$ est une chaîne de Markov.
+    On note $Q$ sa matrice de transition : $$\forall x,y\in\mathbb{Z},\,Q(x,y)=\left\{\begin{array}{ll}
+    \frac{1}{2}&\text{si }\abs{x-y}=1\\
+    0&\text{sinon}
+    \end{array}\right.$$
+    \\
+    On cherche à démontrer les propriétés élémentaires de $(S_n)_{n\geq0}$ :
+    \begin{itemize}[label=$\blacktriangleright$]
+        \item Irréductibilité
+        \item Récurrence
+    \end{itemize}
+    
+    
+    \begin{proof}
+
+    Montrons tout d'abord que $(S_{n})_{n \in \mathbb{N}}$ est irréductible, i.e que tous les états communiquent entre eux.
+        \\  Soit $ (x,y ) \in \mathbb{Z} ^{2}$, tels que $x \neq y $.Posons $k=\abs{x-y}$, alors : $Q^k(x,y)=2^{-k}>0$ et par symétrie, $Q^k(y,x)=2^{-k}>0$.
+        \\Tous les éléments de $\mathbb{Z}$ communiquent donc entre eux, ce qui prouve que $(S_n)_{n \in \mathbb{N}}$ est irréductible sur $\mathbb{Z}$.   \\On sait que tous les états d'une chaîne irréductible sont de même type.
+        \newline
+        Montrons à présent que $(S_n)_{n \in \mathbb{N}}$ est récurrente. Dans un premier temps nous rappelons la formule de Stirling qui donne un équivalent de $n!\text{ quand }n\text{ tends vers }+\infty$ :
+        $$n!\sim\sqrt{2\pi n}{\Big(\frac{n}{e}\Big)}^n$$
+        \\Soit $n\in\mathbb{N}$, $$\p(S_{2n}=0)= \combi{2n}{n}2^{-2n}\sim(\pi n)^{-1/2}$$
+        \\ Or, la série de terme général $u_n=(\pi n)^{-1/2}$ est divergente, on en déduit donc la relation suivante, ce qui achève de prouver que l'état $0$ est récurrent.
+        $$ \mathds{E}_{0} [ N_{0}] =  \sum\limits_{n\in\mathbb{N}}Q^n(0,0)=+\infty$$
+
+        
+      
+    \end{proof}
+    \subsection{Cadre de travail}
+    \begin{definition}
+        \begin{itemize}
+        \item On appelle $F$ l'ensemble des trajectoires aux plus proches voisins partant de $0$ et s'arrêtant au temps $N$.
+        $$F = \{ x =(x^{(0)},..,x^{(N)}) \in \mathds{Z}^{N+1}\text{tels que },x^{(0)} = 0, \forall i \in \llbracket 1, N-1 \rrbracket, |x^{(i+1)} - x^{(i)} | =1 \}$$
+        On remarque que $F$ est de cardinal $2^{N}$.
+        \item On appelle $E$ l'espace des marches aléatoires simples partant de $0$ et revenant en $0$ au temps $N$.
+        $$E = \{ x \in F\,| x^{(N)} = 0 \} $$
+        On remarque que $E$ est de cardinal $$\combi{N}{N/2} \sim \dfrac{2^{N}}{\sqrt{\pi \frac{N}{2}}} \footnote{par la formule de Stirling. On rappelle que $n! \sim \sqrt{2 \pi n} (\frac{e}{n})^{n}$} $$
+    \end{itemize}
+    \end{definition}
+    
+        \begin{figure}[H]
+        \begin{minipage}[b]{.46\linewidth}
+        \centering\includegraphics[width = 9 cm ]{Rplotpremier exemple.png}
+        \caption{Exemple d'une trajectoire dans F (40 pas)\label{fig1}}
+        \end{minipage} \hfill
+        \begin{minipage}[b]{.46\linewidth}
+        \centering\includegraphics[width = 9 cm ]{Rplotsecondexemple.png}
+        \caption{Exemple d'une trajectoire dans E (40 pas) \label{fig2}}
+        \end{minipage}
+    \end{figure}
+    
+    \subsubsection{Notations}
+    \begin{itemize}
+        \item On notera $\nu_E$ la mesure de probabilité uniforme sur $E$, et $\nu_F$,la mesure de probabilité uniforme sur $F$.
+        \item Soit $(x_{n}) \subset E^{\mathbb{N}}$ une suite de trajectoires déterministes de E. On notera  : 
+        $$x_{n} = ( x_n^{(0)}, ..., x_n^{(N)})$$.
+        \item Soit $X_{n} \subset E^{\mathbb{N}}$ une suite de trajectoires aléatoires de E. On notera alors : $$ X_{n} = ( X_n^{(0)}, ..., X_n^{(N)})$$ 
+    \end{itemize}
+    \subsection{Objectif de cette étude}
+    Ce projet a pour but de simuler des trajectoires de $E$ selon $\nu_E$. Pour ce faire, on utilisera les deux méthodes suivantes : 
+    \begin{itemize}[label=$\triangleright$]
+    \item Simulation par la méthode d'acceptation-rejet
+        \begin{description}
+        Dans un premier temps, on commencera par simuler selon $\nu_E$ de facon naïve, en s'inscrivant dans un contexte de variables aléatoires indépendentes et identiquement distribuées (iid). Ainsi, on simulera des trajectoires de $F$, jusqu'à ce que l'on obtienne des trajectoires qui retournent en $0$ au temps $N$. On montrera que ce procédé est un cas particulier de la méthode d'acceptation-rejet, et on évaluera les performances de cette méthode, en s'appuyant sur des résultats relatifs aux méthodes de Montecarlo\footnote{Pour cette partie, la source principale de ce devoir sera le cours de Méthodes de Montecarlo donné en M1 par M. Stoehr, \url{https://www.ceremade.dauphine.fr/~stoehr/M1_Monte_Carlo/Cours_Monte_Carlo.pdf}}. 
+        \end{description} 
+     \item Simulation reposant sur la dynamique de cornerflip
+        \begin{description}
+        Par la suite, on définira une chaîne de Markov dont l'espace d'états est $E$. En s'appuyant sur des notions vues lors du cours de Processus Discrets\footnote{Voir les cours de M1 de Processus Discrets de M. Simenhaus : \url{https://www.ceremade.dauphine.fr/~simenhaus/Francois_Simenhaus_-_Page_personelle/Enseignement_files/Cours2019.pdf}, et de M. Lehec : https://www.ceremade.dauphine.fr/~lehec/processus/poly2017.pdf }, et en exploitant des propriétés relatives aux Temps de mélange \footnote{On s'appuiera principalement sur le cours de M2 donné par M. Salez \url{https://www.ceremade.dauphine.fr/~salez/mixing.pdf}}, on montrera qu'après un temps que l'on déterminera, la chaîne de Markov sera distribuée selon $\nu_{E}$ sur E. Cette méthode de simulation appartient aux méthodes MCMC (\emph{Markov Chain Monte Carlo}). 
+        \end{description} 
+    \end{itemize}
+Enfin, on comparera ces deux procédés de simulation, et on discutera de leur pertinence en fonction des différentes valeurs de $N$
+.
+    \section{Simulation des trajectoires de $E$ par la méthode d'acceptation-rejet}
+    \subsection{Preuve de la validité de la méthode utilisée}
+Pour simuler des trajectoires  partant de $0$ et revenant à $0$ au temps $N$, on va simuler des trajectoires partant de $0$ à $N$ pas, jusqu'à obtenir une trajectoire revenant à $0$ au temps $N$.
+En utilisant les ensembles définis lors de la partie 1,  cela se traduit donc par simuler des trajectoires de $F$ jusqu'a obtenir des trajectoires de $E$. Dans cette partie, on montrera que cette méthode naïve revient effectivement à simuler selon $\nu_{E}$ par la méthode d'acceptation-rejet.
+
+\begin{proposition}
+    Soit $\tau=\inf\Big\{ n\geq0 \big|X_n^{(N)} =0\Big\}$.
+    \begin{itemize}
+        \item $\tau \sim Geom(\frac{\mid E \mid}{\mid F \mid }$);
+        \item $X_{\tau}$ suit une loi uniforme sur $E$;
+        \item $\tau$ et $X_{\tau}$ sont indépendants.
+    \end{itemize}
+    Ainsi la chaîne $(X_{n})_{n \in \mathbb{N}}$ vérifie :
+    $(\tau,X_{\tau})$ a pour loi $Geom(\frac{\mid E \mid}{\mid F \mid})\bigotimes Unif(E)$
+    
+
+\end{proposition}
+\begin{proof}
+    Soit $i\in \mathbb{N}, x \in E \;$ \\
+    $\{\tau=i\,X_{\tau}=x\}= \{X_{1}	\notin E,...,X_{i-1}\notin E,X_{i} \in E\} $\\
+    Alors on a donc :\\
+   $ \mathbb{P}(\tau=i,X_{\tau}=x)=\mathbb{P}(X_{1} \notin E,... X_{i-1}\notin E,X_{i}=x)=\mathbb{P}{(X_{1} \notin E)}^{i-1}\frac{1}{\mid F\mid}={(1-\frac{\mid E\mid}{\mid F \mid})}^{i-1}\frac{\mid E\mid}{\mid F \mid }\frac{1}{\mid E \mid}$
+   \\Ainsi on reconnait bien le produit entre une loi géometrique de paramètre $\frac{\mid E\mid}{\mid F \mid }$  et une loi uniforme sur $E$. Ceci permet d'affirmer les deux premiers points de la proposition.L'indépendance est prouvée par le produit des deux densités.
+    
+
+    
+
+\end{proof}
+
+   % Soit $(X_{n})_{n\geq0}\subset F^\mathbb{N}$, . Notre but est de %prouver que $X_{\tau}$ est distribué sur $E$ selon $\nu_{E}$.
+    %	\\Or, $\p(X_i^{(N)} \neq0)=1-\p(X_i^{(N)} =0)= %1-\dfrac{\abs{E}}{\abs{F}}$
+        
+     %   \\Soit $z \in E$ une trajectoire fixée, 
+      % $ \begin{array}[t]{rcl}
+       % \p\Big(X_\tau=z\Big)&=&
+        %\sum\limits_{i\geq0}\p\Big(X_i=z)\Big(1-\dfrac{\abs{E}}{\abs{F}}\B%ig)^{i-1}\\
+        %&=&\dfrac{1}{\abs{F}}\dfrac{1}{ %1-1+\dfrac{\abs{E}}{\abs{F}}}=\dfrac{1}{\abs{E}}
+        %\end{array}$
+
+
+\subsection{Simulation des trajectoires de F selon $\nu_{F}$}
+
+ \\Pour simuler des trajectoires indépendantes de $F$, on génère des réalisations indépendantes de variables aléatoires réelles suivant une loi de Bernoulli de probabilité 1/2. Montrons que cette méthode permet de simuler selon $\nu_{F}$.
+    \begin{proof}
+        Soit $x= (0, x^{(1)},..,x^{(N)} )$ une trajectoire quelconque déterministe de F. Soit $B_{1},...B_{N}$, $N$ variables aléatoires indépendantes et identiquement distribuées, telles que $B_{1} \thicksim B(1/2).$
+        $$ \mathds{P}( B_{1} = x_{1}... B_{N} = x_{N} ) = \prod_{i \in {1..N}} \mathds{P}( B_{i} = x_{i} ) = \frac{1}{2^{N}} = \frac{1}{|F|} $$
+Donc la méthode décrite permet effectivement de simuler selon $\nu_{F}$. 
+    \end{proof}
+   
+  
+\subsection{Lien avec la méthode d'acceptation-rejet}
+La méthode décrite dans la section 2.2 est un cas particulier de la méthode d'acceptation-rejet, qui appartient aux méthodes de Monte Carlo. 
+Pour simuler selon $\nu_{E}$, en prenant $\nu_{F}$ comme densité instrumentale, il faut que $\nu_{E}$ et $\nu_{F}$ vérifient la relation suivante : 
+
+$$\exists M\geq1,\, \nu_E(X)\leq M \nu_F(X) , \forall X\in F$$
+
+Ce que l'on peut traduire par la relation suivante :
+        $$ \exists M \geq 1, \frac{\mathds{1}_{x \in E}}{\mid E \mid }\leq M \frac{1}{\mid F\mid} $$
+On remarque que cette relation est vérifiée en prenant $ M= \frac{\mid F \mid}{\mid E \mid} \sim \sqrt{\frac{\pi N}{2}} $\footnote{A nouveau par la formule de Stirling.}.
+Par conséquent, utiliser la méthode d'acceptation-rejet dans ce cas particulier revient à simuler uniformément des trajectoires $ X_{n} \in F$, jusqu'à ce que $\mathds{1}_{X_{n} \in E} = 1$, donc jusqu'à ce que l'on obtienne une trajectoire de $E$. 
+
+\subsection{Etude de performance de la méthode d'acceptation-rejet}
+Grace à la partie précédente on sait que $\tau$ suit une loi géométrique de paramètre $\frac{\mid E \mid}{\mid F \mid }$. 
+En particulier, en exploitant les propriétés des lois géométriques, on déduit immédiatement que 
+$$ \mathds{E}[\tau ] = \frac{|F|}{|E|} \sim \sqrt{\frac{\pi N}{2}} $$
+
+On remarque que pour $N$ grand, l'espérance de $\tau$ explose, et l'utilisation de cette méthode devient impossible. 
+\newline 
+\textbf{Vérification numérique}
+\newline 
+On cherche désormais à vérifier ce résultat numériquement. Pour ce faire, on va avoir recours aux Méthodes de Monte-Carlo. En notant $\tau_{1}, .. \tau_{n}$ une suite i.i.d de variables aléatoires de loi $\inf \{ n \geqslant 0 | X_{n,i}^{(N)} = 0 \}$. L'estimateur standard de Monte-Carlo de $E[\tau]$ est $$ \widehat{\delta_{n}} = \frac{1}{n} \sum_{1 \leqslant i \leqslant n} \tau_{i}$$ 
+On sait que $ \widehat{\delta_{n}} \to  E[\tau]$ d'après la loi des grands nombres, et que, par le théorème centrale-limite, $$ E[\tau] \quad \in \quad ] \quad  \widehat{\delta_{n}} - q_{1 - \frac{\alpha}{2}} \sqrt {\text{Var}(\widehat{\delta_{n}}) } \quad ; \quad \widehat{\delta_{n}} + q_{1 - \frac{\alpha}{2}} \sqrt {\text{Var}(\widehat{\delta_{n}}) } \quad [   $$ 
+\\En implémentant le code \texttt{rwalk\_e\_rejet}, on remarque que pour N > 100 000, cette méthode de simulation devient très lente. 
+
+
+De plus, $$ \displaystyle \lim_{n \to + \infty} \frac{\ln(\mathds{E[\tau]})}{\ln(N)} = \frac{1}{2} $$ 
+Pour vérifier ce résultat numériquement, on implémente la fonction \texttt{compute\_mean\_time }, qui fait la moyenne de 1000 réalisations de $\tau$, pour tout entier $N$ donné. 
+Pour $N = 5000$, $\frac{\ln(\mathds{E[\tau]})}{\ln(N)} = 0.523944$. 
+
+\section{ Simulation par la dynamique de $cornerflip$}
+\subsection{Principe de la méthode}
+
+Lors de la première partie, on a prouvé que la méthode de simulation naïve permettait en effet de simuler des trajectoires dans l'espace $E$ . Cependant cette méthode d'acceptation-rejet ne présentait pas de résultats concluants pour $N$ grand. En effet lorsque $N$ est grand ($N \geq 1000 $), le temps d'exécution s'allonge et la méthode n'est plus vraiment efficace. 
+
+On cherche alors à transposer notre problème dans le cadre théorique des Chaînes de Markov. On va définir une chaîne de Markov dont l'espace d'états est $E$ - \emph{la dynamique de cornerflip}, et qui, après un certain temps nommé temps de Mélange, est distribuée sur $E$ selon la probabilité uniforme (la probabilité invariante de notre chaine de markov) $ \nu_{E}$. 
+\\ 
+La dynamique de $cornerflip$ se déroule comme ceci  : 
+    \begin{itemize}
+        \item On part d'une trajectoire $x_{0} \in E$ (i.e une trajectoire qui part de $0$ et revient à $0$ en $n$ pas.)
+        \item On tire une variable aléatoire $U \thicksim U(\{1...N-1\})$ : la valeur de $U$ va nous donner l'abcisse de la trajectoire du site à retourner. 
+        \item S'il s'agit d'un coin, on tire une variable aléatoire $X \thicksim B(\frac{1}{2})$, sinon on ne fait rien.
+        \begin{itemize}
+            \item  Si $X=0$, on retourne le coin vers le bas (si cela est possible).
+            \item Sinon, si $X=1 $ on retourne le coin vers le haut (toujours si cela est possible).
+            \end{itemize}
+    \end{itemize}
+On s'inspire ici du \emph{heat bath dynamic} modele présenté par Pietro Caputo, Fabio Martinelli, et Fabio Lucio Toninelli\footnote{\emph{On the approach to equilibrium for a polymer with adsorption and repulsion}, Journal of Probability, Vol. 13 (2008), Paper no. 10, pages 213–258. }, que l'on cherche à adapter à un horizon de temps discret. 
+
+\subsection{Lien avec la théorie des Chaînes de Markov}
+Nous allons définir la chaine de Markov associé à la dynamique de $CornerFlip$. On introduit alors quelques notations. 
+
+\begin{definition}
+Soit $x = ( x^{(0)}, x^{(1)},... x^{(N)} ) \in F$. 
+\\
+Soit $i \in \{ 1,.., N-1 \}$.\\ Si $x^{(i-1)} = x^{(i+1)}$, alors on dit que la trajectoire x admet un coin en son i-ème site. 
+\\ 
+Si $x^{(i-1)} = x^{(i+1)} = x^{(i)} +1 $, alors on dit que la trajectoire x admet un coin vers le bas en son i-ème site.\\
+Respectivement, si $x^{(i-1)} = x^{(i+1)} = x^{(i)} - 1 $, alors on dit que la trajectoire x admet un coin vers le haut en son i-ème site.\\
+Les seules trajectoires de $F$ qui n'admettent pas de coin sont $ (0,1,2,..,N) $ et $ (0,-1,..,-N ) $. En particulier, si $x \in E$, alors $x$ admet  m coins, $m \in \{ 1..., N-1 \}$. 
+\end{definition}
+\begin{notation}
+Par la suite, $\forall X \in E$, on notera $N(x) \in \{1.. N-1 \}$ le nombre de coins de la trajectoire x. 
+\end{notation}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 9 cm ]{data/vin.png}
+ \caption{Ce graphique affiche une trajectoire de E qui présente 21 coins.} \label{fig2}
+\end{figure}
+
+
+
+
+$$ $$ 
+
+
+\begin{definition}
+Soit $x = ( x^{(0)}, x^{(1)},..., x^{(N)} ) \in E$. 
+\\
+Alors, on définit deux opérateurs  $f_{u}$ et $f_d$, tel que 
+\begin{align*}
+    \begin{split}
+        f_{u} : E \times \{1, .., N-1 \} & \to E \\
+        (x , i) & \mapsto  \left\{\begin{array}{ll}( x_{0}, ...x_{i-1}, x_{i} + 2, x_{i+1},...x_{N} ) \text{ si  } x^{i-1} = x^{i+1}=x^{i} +1
+\\ x \text{ sinon }
+\end{array}\right.
+    \end{split}
+\end{align*}
+\begin{align*}
+    \begin{split}
+        f_{d} : E \times \{1, .., N-1 \} & \to E \\
+        (x , i) & \mapsto  \left\{\begin{array}{ll}( x_{0}, ...x_{i-1}, x_{i} - 2, x_{i+1},...x_{N} ) \text{ si  } x^{i-1} = x^{i+1} = x^{i} -1
+\\ x \text{ sinon }
+\end{array}\right.
+    \end{split}
+\end{align*}
+\begin{itemize}
+   \item L'opérateur $f_{u}$ permet en partant d'une trajectoire de $E$ de retourner le coin en son i-ème site vers le haut ($u$ pour "up") s'il s'agit d'un coin orienté vers le bas et de ne rien faire dans le cas contraire. 
+   \item L'opérateur $f_{d}$ permet, toujours en partant d'une trajectoire de $E$ de retourner le coin en son i-ème site vers le bas (d pour "down") s'il s'agit d'un coin orienté vers le haut, et ne rien faire dans le cas contraire. 
+
+   
+  \end{itemize}
+
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 9 cm ]{retournement.png}
+\caption{Exemple d'utilisation de la fonction $f_{d}$ en retournant un coin vers le bas.} \label{fig3}
+\end{figure}
+\end{definition}
+\newpage 
+On va pouvoir grace à ces opérateurs, définir formellement notre chaîne de Markov.
+\begin{definition}{Définition formelle de la dynamique de cornerflip}
+\\ Soient $(U_n)_{n \in \mathbb{N}}$ suite de variables aléatoires iid, telles que $U_{1} \thicksim \mathcal{U}(\{1...N-1\})$\\
+Soit $(B_{n,k})_{n\geq 1, k \in \{1,...,N-1\}}$ une suite de variables aléatoire iid  telles que $\forall k \in \{1,...,N-1\} $ $B_{1,k} \thicksim \mathcal{B}(1/2)$
+\\De plus, $\forall (i,k), U_{i}$ et $B_{i,k}$ sont deux à deux indépendantes.
+\\Alors on définit  le processus de $cornerflip$ comme la récurrence aléatoire suivante :
+$$  X_{n+1} = \sum_{k=1}^{N-1}\mathds{1}_{U_{n+1} =k} \Bigg( B_{n+1,k}f_{u}( X_{n},k) + (1- B_{n+1,k})f_{d}( X_{n},k) \Bigg) $$
+\end{definition}
+
+On sait que toute récurrence aléatoire est une chaîne de Markov, on cherche donc à établir la matrice de transition de $X_{n}$, que l'on notera $P$.
+
+$$ \mathds{P} ( X_{n+1} = y | X_{n} = x ) =  \left\{\begin{array}{ll}
+\frac{1}{2}\times\frac{1}{N-1}&\text{si } x \ne y  \text{ et } \exists y \text{ tel que } y=f_{d}(x,k) \:  \text {ou }\: \exists y \text{ tel que } y=f_{u}(x,k) \\
+\\ 
+ \frac{1}{2}\times\frac{N(x)}{N-1} + \frac{N-1-N(x)}{N-1}   &\text{si } y=x
+\\
+\\0 & \text{ sinon}
+ 
+\end{array}\right.$$
+
+On peut vérifier que la chaîne est stochastique :
+\begin{proof}
+\begin{align*}
+\sum_{y \in E}P(x,y)= & 
+P(x,x) + \displaystyle\sum_{\substack{y \ne x  \\ \exists k \text{ tel que } y=f_{d}(x,k)  \\  \text {ou } \exists k \text{ tel que }y=f_{u}(x,k)}} P(x,y) \\ =&  \frac{1}{2}\times\frac{N(x)}{N-1} + \frac{N-1-N(x)}{N-1} + \displaystyle\sum_{\substack{y \ne x  \\ \exists k \text{ tel que } y=f_{d}(x,k)  \\  \text {ou } \exists k \text{ tel que }y=f_{u}(x,k)}} \frac{1}{2}\frac{1}{N-1}\\
+\text{Donc,  } \sum_{y \in E}P(x,y) =& \frac{1}{2}\times\frac{N(x)}{N-1} + \frac{N-1-N(x)}{N-1} + N(x) \times \frac{1}{2}\frac{1}{N-1} = 1
+\end{align*}
+
+Ainsi on peut donc conclure que la chaîne est stochastique.
+\end{proof}
+\begin{proposition}
+
+La mesure $\nu_{E}$ est réversible : $$ \forall (x,y) \in E^2, \; \nu_{E}(x)P(x,y)= \nu_{E}(y)P(y,x) $$
+
+\end{proposition}
+
+\begin{proof}
+   $ \forall x \in E, \nu_E(x) = \frac{1}{\mid E\mid} $\\
+   Ainsi montrer que la mesure est réversible revient à montrer que : 
+   $$\forall (x,y) \in E^2, \; P(x,y)=P(y,x)$$
+   Soit $(x,y) \in E^2$
+   \begin{itemize}
+   \item si $y=x$, c'est le cas trivial : $P(x,x)=P(x,x)$;
+   \item si $y \ne x$, et $\exists k$ tel que $y=f_{u}(x,k)$ ou $y=f_{d}(x,k)$ alors $P(x,y)= \frac{1}{2(N-1)}$ C'est évident que l'on a aussi $x=f_{d}(y,k)$ ou $x=f_{u}(y,k)$  bien  et donc on a $P(y,x)= \frac{1}{2(N-1)}$.
+   
+   \end{itemize}
+    
+    
+\end{proof}
+On a alors :
+$$\nu_E P(x)=\sum_{y \in E}\nu_E(y)P(y,x) = \sum_{y \in E}\nu_E(x)P(x,y)=\nu_E(x)\sum_{y \in E}P(x,y)= \nu_E(x)$$
+Ainsi, la chaîne de Markov admet pour mesure invariante la mesure uniforme sur $E$.
+
+\begin{proposition}
+
+$(X_n)_{n \in \mathbb{N}}$ est une chaîne de markov irréductible, récurrente et ergodique.
+
+\end{proposition}
+\begin{proof}
+$E$ est un espace de cardinal fini, donc $X_{n}$ admet au moins un état récurrent. Il suffit donc de montrer que tous les états communiquent entre eux pour prouver que la chaîne est irréductible récurente. 
+$$\text{Soit } x_{0} = ( 0, 1, 2, .... N/2, N/2-1, ....1. 0 )$$
+Montrons que $\forall x \in E, P(x, x_{0}) > 0$. Comme la chaîne est réversible, cela impliquera que tous les états communiquent entre eux. 
+$$ $$
+Soit $x \in E \setminus \{x_{0} \}$. Montrons que $x$ admet au moins un coin dirigé vers le bas, i.e $\exists k \in {1...N-1}, x_{k-1} = x_{k+1} = x_{k} + 1$. 
+On sait que $x$ admet N(x) coins, où $N(x) \in \{1... N-1\}$. Si $x$ admet un unique coin, alors $x = x_{0}$ ou $x = (0, -1, -2, ...., -N/2, -N/2 + 1, ..., -1, 0 )$, donc $x$ admet un coin dirigé vers le bas. 
+\newline 
+Si $x$ admet $N(x)$ coins, alors les coins de $x$ sont alternativement orientés vers le haut et vers le bas. Donc si $N(x) > 1$, alors $x$ admet au moins un coin orienté vers le bas. 
+\newline On définit $ k = inf \{ n, x_{n+1} = x_{n-1} = x_{n} +1 \}$. 
+\newline Par définition de la matrice de transition, $P(x, f(x,k)) = \frac{1}{2(N-1)} > 0$. Etant donné que le cardinal de $E$ est fini, en partant de tout état $x \in E$, si on retourne successivement tous les coins orientés vers le bas, on arrive avec une probabilité non nulle à l'état $x_{0}$. 
+\newline $\forall (x,y) \in E^{2}, \exists k, P^{k}(x, x_{0}) > 0 \text{ et } \exists  m, P^{m} (y, x_{0}) > 0.$ Donc $$ P^{k + m }(x,y) \geqslant P^{k}(x,x_{0}) P^{m}(x_{0}, y) = P^{k}(x,x_{0}) P^{m}(y, x_{0}) > 0$$
+La dernière inégalité vient du caractère réversible de la chaîne de Markov.
+On cherche désormais à démontrer le caractère ergodique de la chaîne, dont on rappelle la définition : 
+ $$\exists t \in \mathbb{N}, \forall (x,y) \in E^{2}, Q^{t}(x,y) >0\footnote{ Cours de M2 de Temps de Mélange, donné par M. Salez \url{https://www.ceremade.dauphine.fr/~salez/mixing.pdf }}.$$
+Par irréductibilité de la chaîne, $$\forall(x,y) \in E, \exists k_{x,y}, P^{k_{x,y}}(x,y) > 0 $$
+On pose $k_{max} = max \{k_{x,y}, \forall (x,y) \in E^2\} $.On sait que $k_{max}$ existe et est fini car $E$ est un espace de cardinal fini. $$\forall (x,y) \in E, P^{k_{max}}(x,y) \geqslant P^{k_{xy}}(x,y) P^{k_{max} -k_{xy}}(y,y) > 0 $$ 
+\end{proof}
+
+\begin{definition}
+On cherche à établir le noyau de la chaîne de Markov étudiée, que l'on note $Q$.Soit $x \in E$,
+
+$$Qf(x) = E_{x}[f(X_{1})] = \sum_{1 \leqslant i \leqslant N-1 } \frac{1}{N-1} E_{\nu_{E}} [ f(X) | X^{j} = x^{j}, \forall j \neq i ]$$ 
+En prenant $f = \mathds{1}_{y}$, on obtient $$ Qf(x) = E_{x}[\mathds{1}_{y}(X)] = \sum_{1 \leqslant i \leqslant N-1 } P_{\nu_{E}}(X = y | X^{(j)} = x^{(j)}, \forall j \neq i) = \frac{1}{2(N-1)}$$
+\end{definition}
+
+On cherche désormais à trouver le temps à partir duquel la chaîne de Markov est distribuée selon une mesure de probabilités suffisament proche de $\nu_{E}$. Nous allons voir qu'il s'agit du temps de mélange. Pour ce faire, on va avoir recours à la théorie des Temps de Mélange des Chaînes de Markov. 
+\subsection{Temps de mélange }
+
+La théorie des Temps de mélange recquiert l'usage de définitions et de théorèmes spécifiques, que nous rappelerons ici. 
+
+\begin{theoreme}{Corollaire du théorème ergodique}
+\\ 
+Soit $(X_{n})_{n\ge0}$ une chaine de markov irréductible récurrente positive. On note $\pi$ son unique mesure de  probabilité invariante. Soit $F : E {\to} \mathbf{R} $ tel que $F \in L^{1}(\pi)$ (i.e $\mathbb{E}_{\pi}(\mid F \mid) < \infty  )$ . Alors, quelque soit la distribution initiale, 
+\[
+  \frac{1}{n}\sum_{i=1}^n \delta_{X_i}  {  \overset{(loi)} \to  \pi } ~ p.s
+\]
+
+
+\end{theoreme}
+
+Le point de départ de la théorie du mélange est le résultat fondamental suivant, qui affirme que la chaîne oublie progressivement sa condition initiale pour atteindre un équilibre global.
+
+\begin{theoreme}
+
+Si Q est ergodique, on a, indépendamment du choix de la loi initiale $\mu$ 
+\[
+   \forall y \in E, \mathbb{P}(X_{t}=y) \underset{t \to +\infty}{{\longrightarrow}} \pi(y)
+\]
+\end{theoreme}
+Dans le cadre de notre étude, on a vu dans la partie précédente que le noyau $P$ est ergodique, ce qui nous permet d'appliquer ces résultats. \\
+La question qui nous intéresse : A quelle vitesse se produit la convergence promise par ce théorème?
+
+$$ $$
+  
+\subsubsection{Distance à l'équilibre}
+Pour mesurer la convergence de $\mathbb{P}(X_{t}=y)$ vers $\pi(y)$, on doit munir l'espace des mesures d'une distance. 
+\begin{definition}
+La distance en variations totales entre deux mesures $\mu$ et $\nu$ sur $S$ est définie par la formule :
+\[
+  d_{TV}(\mu,\nu):= \displaystyle \max_{A\subseteq E} \mid \mu(A) - \nu(A) \mid
+\]
+
+\end{definition}
+
+\begin{proposition}{Caractérisation de la distance en variations totales}
+$$d_{TV}(\mu,\nu) = \sum_{x \in E} (\mu(x) - \nu(x) )_{+} $$
+\begin{proof}
+$\forall A \in E$, $$ \mu(A) - \nu(A) = \sum_{x \in A} (\mu(x) - \nu(x)) \leqslant \sum_{x \in E} (\mu(x) - \nu(x) ) \leqslant \sum_{x \in E} ( \mu(x) - \nu(x))_{+}$$
+En passant en valeurs absolues des deux côtés de l'inégalité, et étant donné que le membre de droite ne dépend pas de $A$, on obtient : 
+$$ d_{TV}(\mu, \nu ) \leqslant \sum_{x \in E} ( \mu(x) - \nu(x))_{+}$$
+Soit $B = \{ x \in E, \mu(x) \geqslant \nu(x) \}$, alors $$ |\mu(B) - \nu(B) | = \sum_{x \in E} ( \mu(x) - \nu(x))_{+} \leqslant  \displaystyle \max_{A \in E} | \mu(A) - \nu(A) | = d_{TV}(\mu,\nu)$$
+\end{proof}
+\end{proposition}
+
+\begin{definition}
+La distance en variations totales nous permet d'exprimer la distance entre la distribution de la chaîne de Markov après $t$ pas, et la mesure invariante. 
+On définit ainsi la distance à l'équilibre de la chaine au temps $t \in \mathbb{N}$ :
+
+$$  D(t) = \displaystyle \max_{x \in E} d_{TV}(P^{t} (x,.),\mu_{E})$$
+
+\end{definition}
+
+
+\begin{proposition}
+La suite $(D(t))_{t \in \mathds{N}}$ est décroissante.  
+\begin{proof}
+$\forall x \in E, \forall A \subset E$, $$P^{t+1}(x,A) - \mu_{E}(A)  =  \sum_{\forall y \in A} (P^{t+1} (x,y) - \mu_{E}(y)) =  \sum_{\forall y \in A} \sum_{\forall z \in E}(P^{t} (x,z)P(z,y) - \mu_{E}(z)P(z,y)) $$
+On obtient cette dernière égalité en utilisant la définition du produit à gauche pour le terme de gauche, et le fait que $\pi$ soit une mesure invariante pour la matrice de transition $P$ pour le terme de droite.\\
+Les ensembles $A$ et $E$ sont de cardinal fini, ce qui nous permet d'inverser les sommes, et d'obtenir l'égalité suivante : 
+$$ \sum_{z \in E}\sum_{y \in A} (P^{t} (x,z)P(z,y) - \mu_{E}(z)P(z,y)) =  \sum_{\forall z \in E} (P^{t} (x,z) - \mu{E}(z) ) \sum_{\forall y \in A} P(z,y) \leqslant \sum_{\forall z \in E} (P^{t} (x,z) - \mu_{E}(z) )_{+} $$ 
+La dernière inégalité est due au fait que $P$ est une matrice de transition stochastique.\\
+On obtient donc $|P^{t+1}(x,A) - \mu_{E}(A)| \leqslant d_{TV}(P^{t}(x,.), \mu_{E})$, ce qui nous donne, 
+$$ \displaystyle \max_{A \subset E} |P^{t+1}(x,A) - \mu_{E}(A)| = d_{TV}(P^{t+1}(x, .), \mu_{E}) \leqslant  d_{TV}(P^{t}(x, .),\mu_{E}) $$ \newline
+Pour conclure, $$ \displaystyle \max_{x \in E} d_{TV}(P^{t+1}(x, .), \mu_{E}) \leqslant \displaystyle \max_{x \in E} d_{TV}(P^{t}(x, .), \mu_{E}).  $$
+$$ D(t+1) \leqslant D(t)$$ 
+\end{proof}
+\end{proposition}
+\begin{lemme}(Sous Multiplicativité)
+Pour tout $s, t \geq 0$, on a :
+$$D(t+s)\leq 2D(t)D(s)$$
+\end{lemme}
+
+La preuve de ce lemme se trouve dans le cours de M2 de temps de mélange, donné par M. Salez.
+
+On souhaite désormais mesurer le temps à partir duquel $D(t)$ est suffisamment petite pour qu'on puisse considérer que la chaîne de Markov de matrice de transition $P$ soit distribuée selon $\mu_{E}.$
+\newline
+
+
+\begin{theoreme}
+$\forall t \in \mathbb{N}$, $$ D(t) \leqslant  \displaystyle \max_{(x,y) \in  E^{2}} d_{TV}(P^{t}(x, .), P^{t}(y, .))$$
+\begin{proof}
+$D(t) = \displaystyle \max_{A \in E} | P^{t}(x,A) - \mu_{E}(A)|$
+$\forall A \in E,$
+\begin{align*}
+    P^{t}(x,A) - \mu_{E}(A) = & \sum_{z \in A} P^{t}(x,z) - \mu_{E}(z) =
+    %\footnote{En utilisant le fait que $\mu_{E}$ est une mesure invariante pour la chaîne de matrice de transition $P$}
+    %\sum_{z \in A} \{ P^{t}(x,z) - \sum_{y \in E}\mu_{E}(y)P^{t}(y,z) \}
+    \\ = & \sum_{z \in A} P^{t}(x,z) - \sum_{y \in E} \mu_{E}(y)P^{t}(y,A) \leqslant P^{t}(x,A) - \displaystyle \min_{ y \in E} P^{t}(y,A)  \\  
+    \leqslant &  \displaystyle \max_{y \in E} ( P^{t}(x,A) - P^{t}(y,A) )
+\end{align*}
+On obtient donc $$ \displaystyle \max_{x \in E}  |P^{t}(x,A) - \mu_{E}(A)| \leqslant  \displaystyle \max_{(x,y) \in E^{2}} |P^{t}(x,A) - P^{t}(y,A)| = \displaystyle \max_{(x,y) \in E^{2}} d_{TV}( P^{t}(x, \cdot) ,P^{t}(x, \cdot) )$$ ( On sait que pour toute fonction réelle $f$,  $| \displaystyle \max_{x \in E} f(x) | \leqslant \displaystyle \max_{x \in E} | f(x) | $) 
+\end{proof}
+\end{theoreme}
+
+Ainsi on peut donc voir la définition du temps de mélange. 
+\begin{definition}
+Pour tout $\varepsilon$ strictement positif, on appelle temps de mélange, et on note $t_{MIX}(\varepsilon)$ la quantité suivante : $$t_{MIX}(\varepsilon) = \displaystyle \min_ {t \geqslant 0}\{D(t) \leqslant \varepsilon \}$$
+\end{definition}
+\subsubsection{Couplage}
+ Nous allons utiliser un outil efficace pour mesurer la distance en variation totale : le couplage.
+ Un $couplage$ entre deux lois $\mu$ et $\nu$ est un couple aléatoire (X,Y) tel que X a pour loi $\mu$ et Y a pour loi $\nu$.
+Un tel couple fournit aussitôt une majoration de $d_{TV}(\mu,\nu)$, à savoir :
+$$d_{TV}(\mu,\nu) \leqslant P( X \neq Y)  $$
+On comprend alors que pour exploiter cette idée, il faut construire une variable aléatoire $X$ de loi $P^{t}(x, \cdot)$, et une variable aléatoire $Y$ de loi $P^{t}(y, \cdot)$, et estimer le temps qu'elles mettent à se rencontrer. 
+\begin{proposition}
+$\forall t \in \mathbb{N}, \forall (x,y) \in E^{2}$, $$ d_{TV}(P^{t}(x, \cdot), P^{t}(y, \cdot) ) \leqslant P( X_{t} \neq Y_{t} ) $$ 
+
+\begin{proof}
+\begin{align*}
+\sum_{z \in A} P^{t}(x, z) - P^{t}(y,z) = & \sum_{z \in A} P_{x}(X_{t} = z) - P_{y}(Y_{t} = z)  \\ = &  \sum_{z \in A} P ( X_{t} = z, Y_{t} \neq z | X_{0} = x, Y_{0} =y) - P( X_{t} \neq z, Y_{t} = z | X_{0} = x, Y_{0} = t ) \\ \leqslant & \sum_{z \in E} P( X_{t} = z, Y_{t} \neq z | X_{0} = x, Y_{0} =y) =  P(X_{t} \neq Y_{t})
+\end{align*}
+\end{proof}
+\end{proposition}
+\subsubsection{Temps de coalescence}
+Pour mieux comprendre, nous introduisons le temps de coalescence. 
+
+\begin{definition}
+On appelle temps de coalescence, et on note $T$, la variable aléatoire suivante : 
+$$ T = \displaystyle \inf_{t \geqslant 0} \{ X_{t} = Y_{t} \}$$ 
+Par définition des récurrences aléatoires $X$ et $Y$, 
+$$ \forall t \geqslant T, \quad \{ X_{t} = Y_{t} \} $$ 
+Ce qui implique que $$ \{ X_{t} \neq Y_{t} \}  \subset \{ T > t \} $$ 
+\end{definition}
+\flushleft
+On conclut donc que $$ D(t) \footnote{ En appliquant le résultat du théorème 4.8 et de la proposition 4.10} \leqslant P(X_{t} \neq Y_{t} ) \leqslant P( T > t)$$ 
+ 
+Mettons maintenant en application cette théorie, en définissant le couplage pour notre dynamique de Corner Flip. 
+L'idée est que, à l'état initial, nous partons de deux trajectoires opposées, toutes deux qui partent de $0$ et reviennent à $0$ en $N$ pas. L'une allant jusq'au sommet $\frac{N}{2}$ et qui redescend et l'autre qui descend jusqu'a $- \frac{N}{2}$ et qui remonte à $0$.
+On sélectionne à chaque fois un site identique pour les deux trajectoires, pour retourner un coin. Si on peut retourner le coin on le retourne, sinon on ne fait rien. On réitère jusqu'à ce que les deux trajectoires se rejoignent en tout point.
+Ecrivons cela mathématiquement
+
+\begin{definition}{Couplage de deux trajectoires}
+
+\newline 
+Soit $x_{0} = (0, 1, 2,.., \frac{N}{2}, \frac{N}{2} - 1, ...0) \in E$
+\newline
+Soit $y_{0} = (0, -1, -2,.., - \frac{N}{2}, - \frac{N}{2} + 1, ...0) \in E $
+\newline 
+Soit $(U_{n})_{n \in \mathbb{N}}$ une suite de variables aléatoires indépendantes et identiquement distribuées, telles que 
+\newline 
+$U_{1} \sim U(1,..,N-1 )$
+\newline 
+Soit $(B_{n,k})_{n \geqslant 1, k \in \{1..N-1 \}} $ une suite de variables aléatoires indépendantes et identiquement distribuées, telles que, $\forall k$, $B_{1,k} \sim B(1/2).$
+\newline $\forall (i,k), U_{i}$ et $B_{i,k}$ sont des variables aléatoires indépendentes. 
+\newline 
+Alors, on définit le couplage comme les deux récurrences aléatoires suivantes :
+\begin{align*}
+    X_{0} &= x_{0}, \forall n \geqslant 1, X_{n+1} =  \sum_{k=1}^{N-1}\mathds{1}_{U_{n+1} =k} \Bigg( B_{n+1,k}f_{u}( X_{n},k) + (1- B_{n+1,k})f_{d}( X_{n},k) \Bigg) 
+    \\ Y_{0} & = y_{0}, \forall n \geqslant 1, Y_{n+1} =  \sum_{k=1}^{N-1}\mathds{1}_{U_{n+1} =k} \Bigg( B_{n+1,k}f_{u}( Y_{n},k) + (1- B_{n+1,k})f_{d}( Y_{n},k) \Bigg) 
+\end{align*}
+\begin{itemize}
+\item On remarque que les récurrences aléatoires $X$ et $Y$ ne sont pas indépendantes, puisqu'elles sont définies à l'aide des mêmes suites d'innovations $U$ et $B$. 
+\item 
+De plus, on remarque que la trajectoire $X$ est toujours située au dessus de la trajectoire $Y$. En effet, si les deux trajectoires coïncident en un point $k \in \{ 1,..N-1 \}$, et qu'il existe $n$ tel que $U_{n} = k$, alors le fait d'appliquer les opérateurs $f_{u}$ ou $f_{d}$ de façon mutuellement exclusive entraîne que $\forall n$ $X_{n}^{(k)} \geqslant Y_{n}^{(k)}$.
+\item Enfin, on note que $X_{t} \sim P^{t}(x_{0}, \cdot ), Y_{t} \sim P^{t}(y_{0}, \cdot). $
+\end{itemize}
+\end{definition}
+
+\begin{figure}[H]
+\begin{minipage}[b]{.46\linewidth}
+        \centering\includegraphics[width = 9 cm ]{image.png}
+        \caption{Les deux trajectoires à l'état initial (100 pas)\label{fig1}}
+        \end{minipage} \hfill
+        \begin{minipage}[b]{.46\linewidth}
+        \centering\includegraphics[width = 9 cm ]{RRR.png}
+        \caption{Les deux trajectoires après plus de 300 000 opérations \label{fig2}}
+        \end{minipage}
+    \end{figure}
+\subsection{Estimation du temps de mélange}
+Nous allons, donc cette partie, estimer le temps de mélange en le majorant par le temps de coalescence. 
+En première partie on le determinera de facon numérique puis en seconde partie de facon théorique. 
+\subsubsection{Estimation numérique d'une borne du temps de mélange}
+On sait que $$ D(t) \leqslant P(T > t)$$ où $T$ désigne le temps de coalescence du couplage des récurrences aléatoires $X$ et $Y$. 
+\newline 
+En notant $F^{(-1)}$ la fonction de répartition inverse de la variable aléatoire $T$, on obtient : 
+$$ P(T > t ) \leqslant \varepsilon \Leftrightarrow 1 - P( T \leqslant t) \leqslant \varepsilon \Leftrightarrow t \geqslant F^{(-1)}(1 - \varepsilon) $$ 
+Ce qui nous donne $$ t_{MIX}(\varepsilon) \leqslant F^{(-1)}(1 - \varepsilon) $$ 
+Par l'implémentation numérique du couplage disponible dans la section 6, on sait obtenir des réalisations de la variable aléatoire $T$. En utilisant la fonction quantile de \cal{Rstudio}, on peut donc obtenir une estimation d'une borne du temps de mélange $t_{MIX}(\varepsilon)$,  pour tout $\varepsilon$ positif. 
+\newline 
+Pour simuler selon $\mu_{E}$, on réalise donc m =  $\lfloor F^{(-1)}(1 - \varepsilon) \rfloor + 1 $ itérations de la chaîne de Markov de matrice de transition $P$\footnote{voir définition 3.5}.  
+\newline 
+\textbf{ Choix du paramètre $\varepsilon$}
+\newline 
+Pour déterminer la valeur de $\varepsilon$, il est courant de choisir $\varepsilon = \frac{1}{4}$ et de noter simplement $t_{MIX}:=t_{MIX}(\frac{1}{4})$.
+En effet, la valeur choisie importe peu puisque, grâce au lemme 4.8, 
+$$ \text{pour } 0 < \varepsilon < \frac{1}{2} \text{ \:fixé\:}, t_{MIX}^{(n)}(\varepsilon)=\vartheta(t_{MIX}^{(n)})$$
+
+On remarque que lorsque $N > 150$, le temps d'exécution de notre fonction \texttt{simu\_cornerflip} devient très grand, et l'implémentation  impossible. 
+
+Pour $N=100$, ( et pour $100$ simulation du temps de coalescence) on obtient : $\frac{\ln(F^{(-1)}(1 - \frac{1}{4}))}{\ln(N)}=\frac{\ln(1053770)}{\ln(100)}=3.011$
+ce qui laisse supposer que le temps de coalescence (et par conséquent le temps de mélange) est de l'ordre de $N^3$.
+
+
+\flushleft
+
+\subsubsection{Estimation théorique d'une borne du temps de mélange}
+\begin{definition}
+On introduit la fonction de déplacement 
+\begin{align*}
+    \Phi : E \to &  \quad \mathbb{R} \\
+    (x_{0},x_{1}..., x_{N}) \to &  \quad \sum_{1 \leqslant i \leqslant N} x^{(i)} \sin ( \frac{\pi i}{N} )
+\end{align*}
+Cette fonction permet de mesurer la déviation de chaque trajectoire par rapport au centre, en accordant plus d'importance aux points situés près du milieu. En effet, la fonction $ x \to \sin(\frac{\pi x}{N})$ est strictement croissante avant $\frac{N}{2}$, puis strictement décroissante.)
+\end{definition}
+Cette fonction permet de mesurer la déviation entre deux trajectoires ordonnées. En effet, soit $(x,y) \in E^{2} $, tel que $\forall i, x^{(i)} \leqslant y^{(i)}$, alors on définit $$ \Phi(y) - \Phi(x) = \Phi(y - x) = \sum_{1 \leqslant i \leqslant N} ( y^{(i)} - x^{(i)} ) \sin ( \frac{\pi i}{N} ) \geqslant 0$$
+
+\begin{definition}
+Soit $(X_{t},Y_{t})$, un couple de variables aléatoires de loi définie dans la définition 4.9.
+\newline 
+On définit  $$\Phi_{t} = \Phi(X_{t},Y_{t}).$$
+On remarque que $\forall t \geqslant T,    \{ \Phi_{t} = 0 \}$. 
+\end{definition}
+On a donc, en notant $\Phi_{min}$ le minimum de $\Phi_{t}$, et en utilisant l'inégalité de Markov \footnote{ $\Phi_{t}$ est positive car les deux trajectoires sont ordonnées.}: $$ P( T > t) \leqslant P( \Phi_{t} \geqslant 0) \leqslant  P( \Phi_{t} \geqslant \Phi_{min}) \leqslant \frac{\mathds{E} [\Phi_{t} ]} { \Phi_{min}} $$
+On cherche tout d'abord à déterminer $\Phi_{min}$. On sait que les déviations qui sont le moins pénalisées par la $\Phi$ sont celles qui se trouvent sur les sites $\{i = 1 \}$ et $\{i = N-1 \}.$, comme dans l'exemple ci-dessous. 
+
+    \centering
+    \includegraphics[width = 9 cm]{diff.png}
+$$ $$ 
+\flushleft
+On établit donc que $ \Phi_{min} = 2 \sin(\frac{\pi}{N}).$
+
+Par la suite, on va donc chercher à obtenir une borne de $ \mathds{E}[\Phi_{t} ] $. 
+
+\begin{proposition} 
+
+$$ Q \Phi(x) - \Phi(x) \leqslant \frac{ - 1 + \cos(\frac{\pi}{N})}{N - 1} \Phi(x)$$ 
+
+\end{proposition}
+\begin{proof}
+
+Soit X une chaîne de Markov de matrice de transition $P$ \footnote{voir définition 3.5}
+On suppose que X admet pour état initial un état $ x \in E$, et on notera $X_{1}$ la position de la chaîne après une transition. 
+\\ $ \forall i \text{ tel que }, 1 \leqslant i \leqslant N$
+$$ \mathds{E}_{x}[X^{(i)}_{1} ] = \frac{N-2}{N-1} x^{(i)} + \frac{x^{(i+1)} + x^{(i - 1 )}}{2(N-1)} $$ 
+$$ \mathds{E}_{x}[\Phi (X_{1}) ] = \sum_{ 1 \leqslant i \leqslant N} \mathds{E}_{x}[ \Phi( X_{1}^{(i)}) ] \sin ( \frac{\pi i }{N} )$$ 
+En combinant ces deux équations, on obtient 
+
+\begin{align*}
+     \mathds{E}_{x}[\Phi (X_{1}) ] & = \frac{N-2}{N-1} \Phi(x) + \frac{1}{2(N-1)} \sum_{ 0 \leqslant i \leqslant N} \mathds{E}_{x}[ \Phi( X_{1}^{(i)}) ] \sin ( \frac{\pi i }{N} )  \\ = &  \frac{N-2}{N-1}\Phi(x) + \frac{1}{2(N-1)} \sum_{ 1 \leqslant i \leqslant N-1}(x^{i+1} + x^{i-1})\sin(\frac{\pi i}{N}) 
+\end{align*}
+
+On obtient alors : 
+\begin{align*}
+     \mathds{E}_{x}[\Phi (X_{1}) ]  - \Phi(x) & = -\frac{1}{N-1}\Phi(x) + \frac{1}{2(N-1)}\displaystyle\sum_{\substack{1\leq i\leq N-1 \\ 0 \leqslant j \leqslant N \\\mid i - j \mid = 1 } }x^{(j)}\sin(\frac{\pi i}{n})\\
+     = & -\frac{1}{N-1}\Phi(x) + \frac{1}{2(N-1)}\displaystyle\sum_{\substack{1\leq i\leq N-1 \\ 1 \leqslant j \leqslant N-1 \\\mid i - j \mid = 1 } }x^{(j)}\sin(\frac{\pi i}{n}) \\
+      = & -\frac{1}{N-1}\Phi(x) + \frac{1}{2(N-1)}\displaystyle\sum_{\substack{0\leq i\leq N \\ 1 \leqslant j \leqslant N-1 \\\mid i - j \mid = 1 } }x^{(j)}\sin(\frac{\pi i}{n}) \\
+     = & \frac{ - 1}{N-1} \Phi(x) + \frac{1}{2 (N - 1)} \sum_{ 1 \leqslant j \leqslant N-1} x^{(j)}  \sin( \frac{\pi (j- 1)}{N} ) + \sin( \frac{\pi ( j + 1)}{N}  ) \\
+     = &  \frac{ - 1}{N-1} \Phi(x) + \frac{1}{2 (N - 1)}  \sum_{ 1 \leqslant j \leqslant N} x^{(j)} 2  \sin( \frac{\pi j}{N} ) \cos ( \frac{\pi}{N}) \\ 
+     = & \frac { - 1 + \cos ( \frac{\pi}{N})}{ N - 1} \Phi(x) 
+\end{align*}
+Pour passer de la première à la deuxième ligne on utilise le fait que $x^{(0)}= x^{(N)} = 0$.\\
+Pour passer de la quatrième à la cinquième ligne on utilise l'égalité trigonométrique : $ \sin(a) + \sin(b) = 2 \sin(\frac{a+b}{2}) \cos(\frac{a-b}{2})$.\\
+On cherche alors à borner la quantité trouvée, pour cela on utilise le développement limité du cosinus :
+\text{on sait que} $$\cos(x) \leqslant 1 - \frac{x^{2}}{2} + \frac{x^{4}}{24} = 1 + (\frac{x^{2}}{2})(-1 + \frac{x^{2}}{12})$$
+\text{Finalement,} 
+\begin{align*}
+\frac{-1 + \cos{\frac{\pi}{N}}}{N-1}\leqslant & \frac{1}{N-1}\frac{{(\frac{\pi}{N}})^{2}}{2}(-1 + \frac{{(\frac{\pi}{N}})^{2}}{12}) \\ \leqslant & -\frac {\pi^{2}}{2N^{3}}
+\end{align*}
+On utilise pour la dernière inégalité  que lorsque $n > 1$, $\frac{(1 - \frac{c}{n^2})}{n-1}\geqslant \frac{1}{n}$ et $\frac{-c}{n}\geq -1$. Ici, $c\leqslant \frac{\pi^{2}}{12}$ donc les conditions sont satisfaites pour $n > 1$.
+
+\end{proof}
+\begin{theoreme}
+$$ \mathds{E}[ \Phi_{t} ] \leqslant \Phi_{0} \exp(-\frac{ \pi^{2}t}{2 N^{3}})$$ 
+\begin{proof}
+En itérant le résultat de la proposition précédente, on obtient facilement : 
+$$\mathds{E}[ \Phi_{t} ] \leqslant \Phi_{0}[1 - \frac{1-\cos{\frac{\pi}{N}}}{N-1}]^{t} $$ 
+$$ ( 1 - \frac{1-\cos{\frac{\pi}{N}}}{N-1})^{t} = \exp( \text{t} \log(1 - \frac{1-\cos{\frac{\pi}{N}}}{N-1})) \to \exp( \text{t} \frac{1 - \cos ( \frac{\pi}{N})}{N - 1}) \leqslant \exp( - \frac{\pi^{2}t}{2N^3})  $$ 
+
+En utilisant la proposition précédente. \\
+De plus, 
+$$ \Phi_{0} = \Phi(x_{0}) - \Phi(y_{0}) \leqslant \frac{N}{4}^{2}$$
+
+On obtient l'inégalité en majorant le sinus par 1.
+\end{proof}
+\end{theoreme} 
+\newline 
+\begin{theoreme}
+Pour simuler selon $\mu_E$, on réalise $m = \floor{\log( \frac{\Phi_{0}}{\varepsilon \Phi_{min}}) \times \frac{2 N^{3}}{\pi^{2}}} + 1 $ itérations de la chaîne de Markov de matrice de transition P, définie lors de la définition 4.9. 
+\begin{proof}
+En combinant les résultats de cette section, on obtient : 
+$$ D(t) \leqslant  P( T > t) \leqslant P( \Phi_{t} \geqslant 0) \leqslant  P( \Phi_{t} \geqslant \Phi_{min}) \leqslant \frac{\mathds{E} [\Phi_{t} ]} { \Phi_{min}} \leqslant \frac{\Phi_{0}}{\Phi_{min}} \exp(-\frac{ \pi^{2}t}{2 N^{3}}) $$
+Soit $t \text{ tel que } \frac{\Phi_{0}}{\Phi_{min}} \exp(-\frac{ \pi^{2}t}{2 N^{3}}) \leqslant \varepsilon$.
+\newline Alors, 
+$$ -\frac{ \pi^{2}t}{2 N^{3}} \leqslant \varepsilon \frac{\Phi_{min}}{\Phi_{0}} \Leftrightarrow t \geqslant \log( \frac{\Phi_{0}}{\varepsilon \Phi_{min}}) \times \frac{2 N^{3}}{\pi^{2}}
+$$
+On conclut que $t_{MIX} \leqslant \floor{\log( \frac{\Phi_{0}}{\varepsilon \Phi_{min}}) \times \frac{2 N^{3}}{\pi^{2}}} + 1$. 
+\end{proof}
+\end{theoreme}
+
+\section{Conclusion : comparaison des approches}
+
+\newline 
+Pour commencer, nous avons simulé la mesure  $\mu_{E}$ dans un contexte de variables aléatoires indépendantes et identiquement distribuées, avec une méthode naïve. Cette méthode,liée à la méthode de l'acceptation-rejet, nécessitait un nombre d'opérations élémentaires de l'ordre de $N^{\frac{1}{2}}.$
+ \\
+Dans la seconde partie de ce devoir, nous avons cherché à développer une nouvelle méthode pour simuler selon $\mu_{E}$, en s'appuyant sur la théorie des chaînes de Markov, et des résultats relatifs au temps de mélange.
+Après une étude théorique et numérique, on constate que cette seconde méthode nécessite un nombre d'actualisations de la chaîne de Markov qui est de l'ordre de $N^{3}$.
+\\ 
+En conclusion, ce devoir nous a permis de simuler selon $\mu_{E}$ en ayant recours à des cadres théoriques très différents, et donc de mettre à profit des outils mathématiques liés à des enseignements variés de notre cursus éducatif. 
+
+
+
+\section{Sources}
+- Cours de Méthodes de Montecarlo donné en M1 par M. Stoehr, \url{https://www.ceremade.dauphine.fr/~stoehr/M1_Monte_Carlo/Cours_Monte_Carlo.pdf}
+\\ 
+- Cours de M1 de Processus Discrets de M. Simenhaus : \url{https://www.ceremade.dauphine.fr/~simenhaus/Francois_Simenhaus_-_Page_personelle/Enseignement_files/Cours2019.pdf}
+\\ 
+- Cours de M1 de Processus Discrets donné par M. Lehec \url{: https://www.ceremade.dauphine.fr/~lehec/processus/poly2017.pdf }
+\\ 
+- Cours de M2 de Temps de Mélange, donné par M. Salez \url{https://www.ceremade.dauphine.fr/~salez/mixing.pdf }
+\\ 
+- \emph{On the approach to equilibrium for a polymer withadsorption and repulsion}, Pietro Caputo, Fabio Martinelli, Fabio Lucio Toninelli, 2008
+\\ 
+- \emph{Markov Chains and Mixing Times, second edition}, David A. Levin, Yuval Peres, With contributions by Elizabeth L. Wilmer \\
+- \emph{Mixing times of lozenge tiling and card shuffling markov chains}, The Annals of Applied Probability2004, Vol. 14, No. 1, 274–325, David Bruce Wilson
+\end{document}
